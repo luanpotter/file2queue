@@ -29,6 +29,19 @@ public class Options {
     @Option(name = "--credentials", usage = "The path of a google credentials file")
     private String credentialsFile;
 
+    @Option(name = "--limit", usage = "Limit the file")
+    private long limit = Long.MAX_VALUE;
+
+    public static Options create(String[] args) {
+        Options options = new Options();
+        if (args.length == 0) {
+            options.readStdin();
+        } else {
+            options.readArgs(args);
+        }
+        return options;
+    }
+
     public void readArgs(String[] args) {
         CmdLineParser parser = new CmdLineParser(this);
         try {
@@ -88,6 +101,10 @@ public class Options {
 
     public String getInputFile() {
         return inputFile;
+    }
+
+    public long getLimit() {
+        return limit;
     }
 
     public enum Type {
