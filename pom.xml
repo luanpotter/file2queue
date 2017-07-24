@@ -81,12 +81,7 @@
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-pubsub</artifactId>
-            <version>0.20.1-beta</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.gcloud</groupId>
-            <artifactId>gcloud-java</artifactId>
-            <version>0.1.7</version>
+            <version>0.20.3-beta</version>
         </dependency>
         <dependency>
             <groupId>org.fusesource.jansi</groupId>
@@ -103,6 +98,10 @@
             <artifactId>google-auth-library-oauth2-http</artifactId>
             <version>0.7.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>22.0</version>
+        </dependency>
     </dependencies>
 </project>

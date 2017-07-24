@@ -15,13 +15,11 @@ import java.io.IOException;
 
 public class PubSubQueue implements Queue {
 
-    private final TopicAdminClient topicAdminClient;
     private final Publisher publisher;
 
     public PubSubQueue(String project, String topicId, String file) {
         TopicName name = TopicName.create(project, topicId);
         try {
-            this.topicAdminClient = createTopicAdmin(file);
             this.publisher = createPublisher(name, file);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -32,13 +30,7 @@ public class PubSubQueue implements Queue {
         return Publisher.defaultBuilder(name).setCredentialsProvider(provider(file)).build();
     }
 
-    private TopicAdminClient createTopicAdmin(String file) throws IOException {
-        CredentialsProvider provider = provider(file);
-        TopicAdminSettings s = TopicAdminSettings.defaultBuilder().setCredentialsProvider(provider).build();
-        return TopicAdminClient.create(s);
-    }
-
-    private CredentialsProvider provider(String file) throws IOException {
+    public static CredentialsProvider provider(String file) throws IOException {
         return FixedCredentialsProvider.create(GoogleCredentials.fromStream(new FileInputStream(file)));
     }
 
@@ -53,7 +45,6 @@ public class PubSubQueue implements Queue {
     public void close() {
         try {
             publisher.shutdown();
-            topicAdminClient.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
