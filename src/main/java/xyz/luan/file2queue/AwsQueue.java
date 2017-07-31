@@ -45,5 +45,6 @@ public class AwsQueue implements Queue {
 
     @Override
     public void close() {
+        sendAll();
     }
 }
