@@ -2,12 +2,20 @@ package xyz.luan.file2queue;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.amazonaws.services.sqs.model.SendMessageBatchRequest;
+import com.amazonaws.services.sqs.model.SendMessageBatchRequestEntry;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class AwsQueue implements Queue {
 
     private String queueUrl;
     private AmazonSQS sqs;
+    private List<String> messages;
+    private AtomicInteger id = new AtomicInteger(0);
 
     public AwsQueue(String queueUrl) {
         String[] parts = queueUrl.split("@");
@@ -16,15 +24,23 @@ public class AwsQueue implements Queue {
         System.setProperty("aws.accessKeyId", p2[0]);
         System.setProperty("aws.secretKey", p2[1]);
         this.sqs = AmazonSQSClientBuilder.standard().withRegion("us-east-2").build();
+        this.messages = new ArrayList<>();
     }
 
     @Override
     public void send(String message) {
-        SendMessageRequest send_msg_request = new SendMessageRequest()
-                .withQueueUrl(queueUrl)
-                .withMessageBody(message)
-                .withDelaySeconds(0);
-        sqs.sendMessage(send_msg_request);
+        this.messages.add(message);
+        if (this.messages.size() == 10) {
+            sendAll();
+        }
+    }
+
+    private void sendAll() {
+        SendMessageBatchRequest req = new SendMessageBatchRequest();
+        req.withEntries(messages.stream().map(s -> new SendMessageBatchRequestEntry("message-id" + id.getAndIncrement(), s)).collect(Collectors.toList()));
+        req.withQueueUrl(queueUrl);
+        sqs.sendMessageBatch(req);
+        messages.clear();
     }
 
     @Override
