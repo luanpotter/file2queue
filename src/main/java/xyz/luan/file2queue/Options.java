@@ -97,6 +97,8 @@ public class Options {
                 return new PubSubQueue(url, queue, credentialsFile);
             case AWS:
                 return new AwsQueue(url);
+            case AWS_FIFO:
+                return new AwsQueueFifo(url);
         }
         throw new RuntimeException("Invalid type: " + type);
     }
@@ -110,6 +112,6 @@ public class Options {
     }
 
     public enum Type {
-        JMS, PUBSUB, AWS
+        JMS, PUBSUB, AWS, AWS_FIFO
     }
 }
